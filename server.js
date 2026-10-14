@@ -6,6 +6,7 @@ const PDFDocument = require("pdfkit");
 const path = require("path");
 
 const app = express();
+app.set("trust proxy", 1);
 app.disable("x-powered-by");
 app.use(helmet({
   contentSecurityPolicy: {
