@@ -25,6 +25,17 @@ app.use(helmet({
 app.use(express.json({ limit: "40kb" }));
 app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h" }));
 app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+app.get("/style.css", (req, res) => {
+  res.sendFile(path.join(__dirname, "style.css"));
+});
+
+app.get("/app.js", (req, res) => {
+  res.sendFile(path.join(__dirname, "app.js"));
+});
+app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 const submitLimiter = rateLimit({
