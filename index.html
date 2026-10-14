@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#26384a">
+  <meta name="description" content="Reliance Egypt employment application form.">
+  <title>Reliance | Application for Employment</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand-mark" aria-hidden="true">R</div>
+    <div><div class="brand-name">RELIANCE</div><div class="brand-subtitle">EGYPT · CAREERS</div></div>
+  </header>
+  <main class="container">
+    <section class="intro">
+      <p class="eyebrow">CAREERS AT RELIANCE</p>
+      <h1>Application for Employment</h1>
+      <p>Complete all relevant fields below. Your application will be sent securely to our recruitment team as a PDF attachment.</p>
+      <div class="notice"><strong>Before you begin:</strong> Please provide accurate information. Fields marked with <span aria-hidden="true">*</span> are required.</div>
+    </section>
+    <form id="application-form" novalidate>
+      <input class="honeypot" type="text" name="website" id="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <section class="form-section">
+        <div class="section-heading"><span>01</span><h2>Personal Information</h2></div>
+        <div class="grid">
+          <label>Application Date<input name="applicationDate" type="date"></label>
+          <label>Full Name <span>*</span><input name="fullName" required autocomplete="name" maxlength="150"></label>
+          <label class="wide">Present Address<textarea name="presentAddress" rows="2" maxlength="1500" autocomplete="street-address"></textarea></label>
+          <label>Home Phone<input name="homePhone" type="tel" maxlength="40"></label>
+          <label>Mobile Phone<input name="mobilePhone" type="tel" maxlength="40" autocomplete="tel"></label>
+          <label>Email Address <span>*</span><input name="email" type="email" required maxlength="254" autocomplete="email"></label>
+          <label>Age<input name="age" type="number" min="16" max="100"></label>
+          <label>Date of Birth<input name="dateOfBirth" type="date"></label>
+          <label>Nationality<input name="nationality" maxlength="100"></label>
+          <label>Marital Status<select name="maritalStatus"><option value="">Select</option><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option><option>Prefer not to say</option></select></label>
+          <label>Gender<select name="gender"><option value="">Select</option><option>Male</option><option>Female</option><option>Prefer not to say</option></select></label>
+          <label>Number of Children<input name="numberOfChildren" type="number" min="0" max="30"></label>
+          <label>Position Applied For <span>*</span><input name="positionAppliedFor" required maxlength="150"></label>
+          <label>Expected Salary<input name="salaryExpected" maxlength="100"></label>
+          <label>Do you have a car and driving license?<select name="hasCarAndLicense"><option value="">Select</option><option>Yes</option><option>No</option></select></label>
+          <label>Notice Period<input name="noticePeriod" maxlength="150" placeholder="e.g. One month"></label>
+        </div>
+      </section>
+      <section class="form-section">
+        <div class="section-heading"><span>02</span><h2>Education History</h2></div>
+        <p class="section-help">Add your schools, universities and qualifications.</p>
+        <div id="education-rows"></div>
+        <button type="button" class="secondary add-row" data-add="education">+ Add education</button>
+      </section>
+      <section class="form-section">
+        <div class="section-heading"><span>03</span><h2>Certificates & Skills</h2></div>
+        <div class="grid">
+          <label>Certificates & Extra Studies<textarea name="certificatesExtraStudies" rows="3" maxlength="1500"></textarea></label>
+          <label>Computer Skills & Programs<textarea name="computerSkills" rows="3" maxlength="1500"></textarea></label>
+        </div>
+        <h3>Language Skills</h3>
+        <div class="grid">
+          <label>English<select name="englishLevel"><option value="">Select level</option><option>Fluent</option><option>Good</option><option>Below average</option></select></label>
+          <label>French<select name="frenchLevel"><option value="">Select level</option><option>Fluent</option><option>Good</option><option>Below average</option></select></label>
+          <label>Other Language<input name="otherLanguage" maxlength="100"></label>
+          <label>Other Language Level<select name="otherLanguageLevel"><option value="">Select level</option><option>Fluent</option><option>Good</option><option>Below average</option></select></label>
+        </div>
+      </section>
+      <section class="form-section">
+        <div class="section-heading"><span>04</span><h2>Employment History</h2></div>
+        <p class="section-help">List your most recent roles first. You can add up to six positions.</p>
+        <div id="employment-rows"></div>
+        <button type="button" class="secondary add-row" data-add="employment">+ Add employment</button>
+      </section>
+      <section class="form-section">
+        <div class="section-heading"><span>05</span><h2>References</h2></div>
+        <p class="section-help">Please provide up to three professional references who are not relatives.</p>
+        <div id="reference-rows"></div>
+        <button type="button" class="secondary add-row" data-add="references">+ Add reference</button>
+      </section>
+      <section class="form-section">
+        <div class="section-heading"><span>06</span><h2>Additional Information</h2></div>
+        <label>Do you have relatives or friends currently working at Reliance?
+          <select name="hasRelianceContacts" id="hasRelianceContacts"><option value="">Select</option><option>Yes</option><option>No</option></select>
+        </label>
+        <label id="contact-details-wrap" hidden>If yes, state their name and position<textarea name="relianceContactDetails" rows="2" maxlength="1000"></textarea></label>
+      </section>
+      <section class="form-section declaration">
+        <div class="section-heading"><span>07</span><h2>Declaration & Signature</h2></div>
+        <p>I declare that the information provided in this application is accurate and complete. I understand that any misrepresentation or omission of facts may affect my application or employment.</p>
+        <label class="check-label"><input type="checkbox" name="declaration" value="accepted" required><span>I confirm that the information provided is accurate and complete. <b>*</b></span></label>
+        <div class="grid">
+          <label>Typed Signature (Full Name) <span>*</span><input name="signatureName" required maxlength="150"></label>
+          <label>Signature Date <span>*</span><input name="signatureDate" type="date" required></label>
+        </div>
+      </section>
+      <section class="privacy-note">
+        <strong>Privacy notice</strong>
+        <p>Your application details will be used for recruitment purposes and emailed to Reliance Egypt's recruitment team. This website is configured not to store application records in a database. Please do not include unnecessary sensitive information.</p>
+      </section>
+      <div id="form-message" class="form-message" role="status" aria-live="polite"></div>
+      <div class="submit-row"><span>Review your details before submitting.</span><button id="submit-button" type="submit">Submit Application <span aria-hidden="true">→</span></button></div>
+    </form>
+    <footer>© <span id="year"></span> Reliance Egypt · Recruitment</footer>
+  </main>
+</body>
+</html>
