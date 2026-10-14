@@ -218,7 +218,7 @@ app.post("/api/submit", submitLimiter, async (req, res) => {
       error: "We could not submit your application right now. Please try again later."
     });
   }
-
+});
 app.get("/health", (_req, res) => res.status(200).json({ ok: true }));
 const port = Number(process.env.PORT || 3000);
 app.listen(port, "0.0.0.0", () => console.log(`Reliance application server listening on port ${port}`));
