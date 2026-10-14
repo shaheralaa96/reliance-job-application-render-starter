@@ -213,7 +213,7 @@ app.post("/api/submit", submitLimiter, async (req, res) => {
       responseCode: err?.responseCode,
       command: err?.command
     });
-
+  }
     return res.status(500).json({
       error: "We could not submit your application right now. Please try again later."
     });
