@@ -205,10 +205,20 @@ app.post("/api/submit", submitLimiter, async (req, res) => {
     });
     // No database, disk writes, or application-content logging. Payload/PDF remain transient in memory.
     return res.status(200).json({ ok: true, message: "Thank you. Your application has been submitted successfully." });
-  } catch (_) {
-    return res.status(500).json({ error: "We could not submit your application right now. Please try again later." });
+
+  } catch (err) {
+    console.error("Application submission failed:", {
+      name: err?.name,
+      code: err?.code,
+      responseCode: err?.responseCode,
+      command: err?.command
+    });
+
+    return res.status(500).json({
+      error: "We could not submit your application right now. Please try again later."
+    });
   }
-});
+
 app.get("/health", (_req, res) => res.status(200).json({ ok: true }));
 const port = Number(process.env.PORT || 3000);
 app.listen(port, "0.0.0.0", () => console.log(`Reliance application server listening on port ${port}`));
