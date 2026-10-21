@@ -10,15 +10,15 @@ const rowConfig = {
   education: {
     container: "education-rows", max: 8, title: "Education",
     fields: [
-      ["schoolUniversity","School / University","text"],["certificate","Certificate","text"],
-      ["majorDegree","Major & Degree","text"],["grade","Grade","text"],["graduationDate","Graduation Date","date"]
+      ["schoolUniversity","School / University","text",true],["schoolLocation","School / University Location","text",true],["certificate","Certificate","text",false],
+      ["majorDegree","Major / Degree","text",true],["grade","Grade","text",true],["graduationDate","Graduation Date","date",true]
     ]
   },
   employment: {
     container: "employment-rows", max: 6, title: "Employment",
     fields: [
-      ["company","Company","text"],["jobTitle","Job Title","text"],["from","From","date"],
-      ["to","To","date"],["lastPackage","Last Package","text"],["reasonForLeaving","Reason for Leaving","text"]
+      ["company","Company","text",true],["jobTitle","Job Title","text",true],["from","From","date",true],
+      ["to","To","date",true],["lastPackage","Last Package","text",false],["reasonForLeaving","Reason for Leaving","text",true]
     ]
   },
   references: {
@@ -44,10 +44,14 @@ function addRow(type) {
   }
   card.appendChild(head);
   const grid = document.createElement("div"); grid.className = "row-grid";
-  cfg.fields.forEach(([name,label,typeAttr]) => {
-    const lab = document.createElement("label"); lab.textContent = label;
+  cfg.fields.forEach(([name,label,typeAttr,required]) => {
+    const lab = document.createElement("label");
+    lab.append(document.createTextNode(label));
+    if (required) {
+      const mark = document.createElement("span"); mark.textContent = " *"; mark.style.color = "#a12626"; lab.appendChild(mark);
+    }
     const input = document.createElement("input");
-    input.type = typeAttr; input.name = `${type}_${name}`; input.maxLength = 250;
+    input.type = typeAttr; input.name = `${type}_${name}`; input.maxLength = 250; input.required = Boolean(required);
     if (typeAttr === "text" || typeAttr === "tel") input.autocomplete = "off";
     lab.appendChild(input); grid.appendChild(lab);
   });
@@ -72,6 +76,14 @@ function updateAddButtons() {
 }
 document.querySelectorAll("[data-add]").forEach(btn => btn.addEventListener("click", () => addRow(btn.dataset.add)));
 addRow("education"); addRow("employment"); addRow("references");
+document.getElementById("hearAboutUs").addEventListener("change", e => {
+  const otherWrap = document.getElementById("hear-about-other-wrap");
+  const otherInput = document.getElementById("hearAboutUsOther");
+  const showOther = e.target.value === "Other";
+  otherWrap.hidden = !showOther;
+  otherInput.required = showOther;
+  if (!showOther) otherInput.value = "";
+});
 document.getElementById("hasRelianceContacts").addEventListener("change", e => {
   document.getElementById("contact-details-wrap").hidden = e.target.value !== "Yes";
 });
@@ -103,10 +115,6 @@ form.addEventListener("submit", async event => {
   event.preventDefault();
   message.className = "form-message"; message.textContent = "";
   if (!form.reportValidity()) return;
-  if (form.elements.signatureName.value.trim() !== form.elements.fullName.value.trim()) {
-    showMessage("Please enter your full name in the typed signature field to confirm your application.", "error");
-    form.elements.signatureName.focus(); return;
-  }
   submitButton.disabled = true;
   submitButton.textContent = "Submitting…";
   try {
@@ -124,6 +132,7 @@ form.addEventListener("submit", async event => {
     form.elements.applicationDate.value = today;
     form.elements.signatureDate.value = today;
     document.getElementById("contact-details-wrap").hidden = true;
+    document.getElementById("hear-about-other-wrap").hidden = true;
     updateAddButtons();
     showMessage(result.message || "Your application has been submitted successfully.", "success");
   } catch (err) {
