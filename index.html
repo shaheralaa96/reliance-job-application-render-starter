@@ -28,20 +28,20 @@
         <div class="grid">
           <label>Application Date<input name="applicationDate" type="date"></label>
           <label>Full Name <span>*</span><input name="fullName" required autocomplete="name" maxlength="150"></label>
-          <label class="wide">Present Address<textarea name="presentAddress" rows="2" maxlength="1500" autocomplete="street-address"></textarea></label>
+          <label class="wide">Present Address <span>*</span><textarea name="presentAddress" rows="2" maxlength="1500" autocomplete="street-address" required></textarea></label>
           <label>Home Phone<input name="homePhone" type="tel" maxlength="40"></label>
-          <label>Mobile Phone<input name="mobilePhone" type="tel" maxlength="40" autocomplete="tel"></label>
+          <label>Mobile Phone <span>*</span><input name="mobilePhone" type="tel" maxlength="40" autocomplete="tel" required></label>
           <label>Email Address <span>*</span><input name="email" type="email" required maxlength="254" autocomplete="email"></label>
-          <label>Age<input name="age" type="number" min="16" max="100"></label>
-          <label>Date of Birth<input name="dateOfBirth" type="date"></label>
-          <label>Nationality<input name="nationality" maxlength="100"></label>
-          <label>Marital Status<select name="maritalStatus"><option value="">Select</option><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option><option>Prefer not to say</option></select></label>
-          <label>Gender<select name="gender"><option value="">Select</option><option>Male</option><option>Female</option><option>Prefer not to say</option></select></label>
+          <label>Age <span>*</span><input name="age" type="number" min="16" max="100" required></label>
+          <label>Date of Birth <span>*</span><input name="dateOfBirth" type="date" required></label>
+          <label>Nationality <span>*</span><input name="nationality" maxlength="100" required></label>
+          <label>Marital Status <span>*</span><select name="maritalStatus" required><option value="">Select</option><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option><option>Prefer not to say</option></select></label>
+          <label>Gender <span>*</span><select name="gender" required><option value="">Select</option><option>Male</option><option>Female</option><option>Prefer not to say</option></select></label>
           <label>Number of Children<input name="numberOfChildren" type="number" min="0" max="30"></label>
           <label>Position Applied For <span>*</span><input name="positionAppliedFor" required maxlength="150"></label>
-          <label>Expected Salary<input name="salaryExpected" maxlength="100"></label>
+          <label>Expected Salary <span>*</span><input name="salaryExpected" maxlength="100" required></label>
           <label>Do you have a car and driving license?<select name="hasCarAndLicense"><option value="">Select</option><option>Yes</option><option>No</option></select></label>
-          <label>Notice Period<input name="noticePeriod" maxlength="150" placeholder="e.g. One month"></label>
+          <label>Notice Period <span>*</span><input name="noticePeriod" maxlength="150" placeholder="e.g. One month" required></label>
         </div>
       </section>
       <section class="form-section">
@@ -58,7 +58,7 @@
         </div>
         <h3>Language Skills</h3>
         <div class="grid">
-          <label>English<select name="englishLevel"><option value="">Select level</option><option>Fluent</option><option>Good</option><option>Below average</option></select></label>
+          <label>English <span>*</span><select name="englishLevel" required><option value="">Select level</option><option>Fluent</option><option>Good</option><option>Below average</option><option>Conversational</option></select></label>
           <label>French<select name="frenchLevel"><option value="">Select level</option><option>Fluent</option><option>Good</option><option>Below average</option></select></label>
           <label>Other Language<input name="otherLanguage" maxlength="100"></label>
           <label>Other Language Level<select name="otherLanguageLevel"><option value="">Select level</option><option>Fluent</option><option>Good</option><option>Below average</option></select></label>
@@ -78,8 +78,13 @@
       </section>
       <section class="form-section">
         <div class="section-heading"><span>06</span><h2>Additional Information</h2></div>
-        <label>Do you have relatives or friends currently working at Reliance?
-          <select name="hasRelianceContacts" id="hasRelianceContacts"><option value="">Select</option><option>Yes</option><option>No</option></select>
+        <div class="grid">
+          <label>How did you hear about us? <span>*</span><select name="hearAboutUs" id="hearAboutUs" required><option value="">Select</option><option>LinkedIn</option><option>Employee Referral</option><option>Social Media</option><option>Website</option><option>Other</option></select></label>
+          <label id="hear-about-other-wrap" hidden>Please specify <span>*</span><input name="hearAboutUsOther" id="hearAboutUsOther" maxlength="250"></label>
+          <label>Are you willing to travel? <span>*</span><select name="willingToTravel" required><option value="">Select</option><option>Yes</option><option>No</option></select></label>
+        </div>
+        <label>Do you have relatives or friends currently working at Reliance? <span>*</span>
+          <select name="hasRelianceContacts" id="hasRelianceContacts" required><option value="">Select</option><option>Yes</option><option>No</option></select>
         </label>
         <label id="contact-details-wrap" hidden>If yes, state their name and position<textarea name="relianceContactDetails" rows="2" maxlength="1000"></textarea></label>
       </section>
@@ -88,7 +93,7 @@
         <p>I declare that the information provided in this application is accurate and complete. I understand that any misrepresentation or omission of facts may affect my application or employment.</p>
         <label class="check-label"><input type="checkbox" name="declaration" value="accepted" required><span>I confirm that the information provided is accurate and complete. <b>*</b></span></label>
         <div class="grid">
-          <label>Typed Signature (Full Name) <span>*</span><input name="signatureName" required maxlength="150"></label>
+          <label>Signature <span>*</span><input name="signatureName" required maxlength="150" placeholder="Type your signature"></label>
           <label>Signature Date <span>*</span><input name="signatureDate" type="date" required></label>
         </div>
       </section>
