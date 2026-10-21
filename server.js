@@ -231,6 +231,14 @@ function val(v) {
     : String(v).trim();
 }
 
+function safeFilenamePart(value) {
+  return clean(value, 100)
+    .normalize("NFKD")
+    .replace(/[\\u0300-\\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 60) || "Applicant";
+}
 
 function makePdf(p) {
   return new Promise((resolve, reject) => {
@@ -238,7 +246,7 @@ function makePdf(p) {
       size: "A4",
       margins: { top: 38, bottom: 38, left: 42, right: 42 },
       info: {
-        Title: "Reliance Employment Application",
+        Title: `Reliance Employment Application - ${p.fullName} - ${p.positionAppliedFor}`,
         Author: "Reliance Egypt"
       }
     });
@@ -294,6 +302,8 @@ function makePdf(p) {
     }
 
     function twoFields(labelA, valueA, labelB, valueB) {
+      // Keep both columns on the same page instead of splitting a row across pages.
+      ensureSpace(90);
       const startY = doc.y;
       field(labelA, valueA, colWidth);
       const endYA = doc.y;
@@ -330,8 +340,8 @@ function makePdf(p) {
 
     // Official Reliance logo, matching the online application header.
     const logoPath = path.join(__dirname, "logo.png");
-    const logoWidth = 210;
-    const logoHeight = 95;
+    const logoWidth = 155;
+    const logoHeight = 68;
     doc.image(logoPath, (doc.page.width - logoWidth) / 2, doc.y, {
       fit: [logoWidth, logoHeight],
       align: "center",
@@ -476,7 +486,7 @@ app.post("/api/submit", submitLimiter, async (req, res) => {
         "The completed application is attached as a PDF. Handle it as confidential personal information.",
       attachments: [
         {
-          filename: "Reliance_Employment_Application.pdf",
+          filename: `${safeFilenamePart(payload.fullName)}_${safeFilenamePart(payload.positionAppliedFor)}.pdf`,
           content: pdf,
           contentType: "application/pdf"
         }
