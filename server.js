@@ -310,13 +310,16 @@ function makePdf(p) {
       });
     }
 
-    // Header styled to echo the online application page.
-    doc.fillColor(navy).font("Helvetica-Bold").fontSize(20)
-      .text("RELIANCE", { align: "center" });
-    doc.moveDown(0.15);
-    doc.fillColor(muted).font("Helvetica-Bold").fontSize(8)
-      .text("EGYPT  ·  CAREERS", { align: "center" });
-    doc.moveDown(0.35);
+    // Official Reliance logo, matching the online application header.
+    const logoPath = path.join(__dirname, "logo.png");
+    const logoWidth = 210;
+    const logoHeight = 95;
+    doc.image(logoPath, (doc.page.width - logoWidth) / 2, doc.y, {
+      fit: [logoWidth, logoHeight],
+      align: "center",
+      valign: "center"
+    });
+    doc.y += logoHeight + 4;
     doc.fillColor(navy).font("Helvetica-Bold").fontSize(14)
       .text("APPLICATION FOR EMPLOYMENT", { align: "center" });
     doc.moveDown(0.3);
