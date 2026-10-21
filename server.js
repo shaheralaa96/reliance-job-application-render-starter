@@ -108,6 +108,9 @@ function buildPayload(body) {
     "numberOfChildren",
     "positionAppliedFor",
     "salaryExpected",
+    "hearAboutUs",
+    "hearAboutUsOther",
+    "willingToTravel",
     "hasCarAndLicense",
     "noticePeriod",
     "certificatesExtraStudies",
@@ -136,6 +139,7 @@ function buildPayload(body) {
 
   p.education = flattenRows(body.education, [
     "schoolUniversity",
+    "schoolLocation",
     "certificate",
     "majorDegree",
     "grade",
@@ -162,17 +166,25 @@ function buildPayload(body) {
 }
 
 function validate(p) {
-  if (!p.fullName) return "Please enter your full name.";
+  const requiredFields = {
+    fullName: "full name", presentAddress: "present address", mobilePhone: "mobile phone",
+    email: "email address", age: "age", dateOfBirth: "date of birth", nationality: "nationality",
+    maritalStatus: "marital status", gender: "gender", salaryExpected: "expected salary",
+    positionAppliedFor: "position applied for", noticePeriod: "notice period", englishLevel: "English level",
+    hasRelianceContacts: "whether you have relatives or friends at Reliance",
+    hearAboutUs: "how you heard about us", willingToTravel: "travel availability",
+    signatureName: "signature", signatureDate: "signature date"
+  };
+  for (const [key, label] of Object.entries(requiredFields)) if (!p[key]) return `Please provide ${label}.`;
   if (!safeEmail(p.email)) return "Please enter a valid email address.";
-  if (!p.positionAppliedFor) {
-    return "Please enter the position you are applying for.";
-  }
-  if (p.declaration !== "accepted") {
-    return "Please confirm the applicant declaration before submitting.";
-  }
-  if (!p.signatureName) return "Please enter your typed signature.";
-  if (!p.signatureDate) return "Please enter the signature date.";
-
+  if (p.declaration !== "accepted") return "Please confirm the applicant declaration before submitting.";
+  if (p.hearAboutUs === "Other" && !p.hearAboutUsOther) return "Please specify how you heard about us.";
+  if (!Array.isArray(p.education) || !p.education.length) return "Please add at least one education entry.";
+  const requiredEducation = ["schoolUniversity", "schoolLocation", "majorDegree", "grade", "graduationDate"];
+  for (const [i, row] of p.education.entries()) for (const key of requiredEducation) if (!row[key]) return `Please complete ${key} for education entry ${i + 1}.`;
+  if (!Array.isArray(p.employment) || !p.employment.length) return "Please add at least one employment entry.";
+  const requiredEmployment = ["company", "jobTitle", "from", "to", "reasonForLeaving"];
+  for (const [i, row] of p.employment.entries()) for (const key of requiredEmployment) if (!row[key]) return `Please complete ${key} for employment entry ${i + 1}.`;
   return null;
 }
 
@@ -192,6 +204,9 @@ function labelFor(key) {
     numberOfChildren: "Number of Children",
     positionAppliedFor: "Position Applied For",
     salaryExpected: "Expected Salary",
+    hearAboutUs: "How did you hear about us?",
+    hearAboutUsOther: "How did you hear about us? (Other)",
+    willingToTravel: "Willing to Travel",
     hasCarAndLicense: "Car and Driving License",
     noticePeriod: "Notice Period",
     certificatesExtraStudies: "Certificates & Extra Studies",
@@ -342,8 +357,8 @@ function makePdf(p) {
     fullField("Notice Period", p.noticePeriod);
 
     repeatedSection("02", "Education History", p.education,
-      ["schoolUniversity", "certificate", "majorDegree", "grade", "graduationDate"],
-      ["School / University", "Certificate", "Major & Degree", "Grade", "Graduation Date"]);
+      ["schoolUniversity", "schoolLocation", "certificate", "majorDegree", "grade", "graduationDate"],
+      ["School / University", "School / University Location", "Certificate", "Major / Degree", "Grade", "Graduation Date"]);
 
     section("03", "Certificates & Skills");
     fullField("Certificates & Extra Studies", p.certificatesExtraStudies, 40);
@@ -360,6 +375,9 @@ function makePdf(p) {
       ["Name", "Position", "Company", "Phone Number"]);
 
     section("06", "Additional Information");
+    fullField("How did you hear about us?", p.hearAboutUs);
+    if (p.hearAboutUs === "Other") fullField("Please specify", p.hearAboutUsOther);
+    fullField("Are you willing to travel?", p.willingToTravel);
     fullField("Relatives or friends currently working at Reliance?", p.hasRelianceContacts);
     if (p.hasRelianceContacts === "Yes") {
       fullField("Name and Position", p.relianceContactDetails, 40);
@@ -369,7 +387,7 @@ function makePdf(p) {
     fullField("Declaration",
       "I declare that the information provided in this application is accurate and complete. I understand that any misrepresentation or omission of facts may affect my application or employment.",
       44);
-    twoFields("Typed Signature (Full Name) *", p.signatureName, "Signature Date *", p.signatureDate);
+    twoFields("Signature *", p.signatureName, "Signature Date *", p.signatureDate);
 
     doc.moveDown(0.5);
     doc.fillColor(muted).font("Helvetica").fontSize(7.5)
