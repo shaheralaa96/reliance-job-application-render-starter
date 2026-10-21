@@ -36,6 +36,9 @@ app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h" }));
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
+app.get("/logo.png", (req, res) => {
+  res.sendFile(path.join(__dirname, "logo.png"));
+});
 
 app.get("/style.css", (req, res) => {
   res.sendFile(path.join(__dirname, "style.css"));
