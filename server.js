@@ -213,63 +213,12 @@ function val(v) {
     : String(v).trim();
 }
 
-function addText(doc, title, value) {
-  doc.font("Helvetica-Bold")
-    .fontSize(9)
-    .fillColor("#26384A")
-    .text(title);
-
-  doc.font("Helvetica")
-    .fontSize(10)
-    .fillColor("#222222")
-    .text(val(value), { width: 500 });
-
-  doc.moveDown(0.55);
-}
-
-function addRows(doc, title, rows, keys, labels) {
-  doc.addPage();
-
-  doc.font("Helvetica-Bold")
-    .fontSize(15)
-    .fillColor("#26384A")
-    .text(title);
-
-  doc.moveDown();
-
-  if (!rows.length) {
-    doc.font("Helvetica").fontSize(10).text("—");
-    return;
-  }
-
-  rows.forEach((row, i) => {
-    if (doc.y > 680) doc.addPage();
-
-    doc.font("Helvetica-Bold")
-      .fontSize(11)
-      .fillColor("#26384A")
-      .text(`${title} ${i + 1}`);
-
-    doc.moveDown(0.3);
-
-    keys.forEach((key, j) => {
-      addText(doc, labels[j], row[key]);
-    });
-
-    doc.moveDown(0.4);
-  });
-}
 
 function makePdf(p) {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({
       size: "A4",
-      margins: {
-        top: 48,
-        bottom: 48,
-        left: 52,
-        right: 52
-      },
+      margins: { top: 38, bottom: 38, left: 42, right: 42 },
       info: {
         Title: "Reliance Employment Application",
         Author: "Reliance Egypt"
@@ -277,129 +226,150 @@ function makePdf(p) {
     });
 
     const chunks = [];
-
     doc.on("data", chunk => chunks.push(chunk));
     doc.on("end", () => resolve(Buffer.concat(chunks)));
     doc.on("error", reject);
 
-    doc.font("Helvetica-Bold")
-      .fontSize(19)
-      .fillColor("#26384A")
+    const pageWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+    const navy = "#26384A";
+    const muted = "#64748B";
+    const border = "#CBD5E1";
+    const pale = "#F1F5F9";
+    const ink = "#1F2937";
+    const gap = 10;
+    const colWidth = (pageWidth - gap) / 2;
+
+    function ensureSpace(height) {
+      if (doc.y + height > doc.page.height - doc.page.margins.bottom) {
+        doc.addPage();
+      }
+    }
+
+    function section(number, title) {
+      ensureSpace(38);
+      const y = doc.y;
+      doc.roundedRect(doc.page.margins.left, y, pageWidth, 27, 4).fill(pale);
+      doc.fillColor(navy).font("Helvetica-Bold").fontSize(10)
+        .text(number, doc.page.margins.left + 9, y + 8, { width: 22 });
+      doc.fillColor(navy).font("Helvetica-Bold").fontSize(11)
+        .text(title, doc.page.margins.left + 34, y + 7, { width: pageWidth - 42 });
+      doc.y = y + 35;
+    }
+
+    function field(label, value, width, opts = {}) {
+      const x = doc.page.margins.left + (opts.xOffset || 0);
+      const labelHeight = 12;
+      const innerWidth = width - 14;
+      const valueText = val(value);
+      doc.font("Helvetica").fontSize(9);
+      const textHeight = Math.max(12, doc.heightOfString(valueText, { width: innerWidth, lineGap: 1 }));
+      const boxHeight = Math.max(opts.minHeight || 27, textHeight + 12);
+      ensureSpace(labelHeight + boxHeight + 8);
+      const y = doc.y;
+      doc.fillColor(muted).font("Helvetica-Bold").fontSize(7.5)
+        .text(label, x, y, { width, height: labelHeight, lineBreak: false, ellipsis: true });
+      doc.roundedRect(x, y + 13, width, boxHeight, 3)
+        .lineWidth(0.7).strokeColor(border).stroke();
+      doc.fillColor(ink).font("Helvetica").fontSize(9)
+        .text(valueText, x + 7, y + 19, { width: innerWidth, lineGap: 1 });
+      doc.y = y + labelHeight + boxHeight + 8;
+    }
+
+    function twoFields(labelA, valueA, labelB, valueB) {
+      const startY = doc.y;
+      field(labelA, valueA, colWidth);
+      const endYA = doc.y;
+      doc.y = startY;
+      field(labelB, valueB, colWidth, { xOffset: colWidth + gap });
+      const endYB = doc.y;
+      doc.y = Math.max(endYA, endYB);
+    }
+
+    function fullField(label, value, minHeight = 27) {
+      field(label, value, pageWidth, { minHeight });
+    }
+
+    function repeatedSection(number, title, rows, keys, labels) {
+      section(number, title);
+      if (!rows.length) {
+        fullField("No entries provided", "—");
+        return;
+      }
+      rows.forEach((row, index) => {
+        ensureSpace(45);
+        doc.fillColor(navy).font("Helvetica-Bold").fontSize(9)
+          .text(title.replace(/ History$/, "") + " " + (index + 1));
+        doc.moveDown(0.35);
+        for (let i = 0; i < keys.length; i += 2) {
+          const k1 = keys[i];
+          const k2 = keys[i + 1];
+          if (k2) twoFields(labels[i], row[k1], labels[i + 1], row[k2]);
+          else fullField(labels[i], row[k1]);
+        }
+        doc.moveDown(0.35);
+      });
+    }
+
+    // Header styled to echo the online application page.
+    doc.fillColor(navy).font("Helvetica-Bold").fontSize(20)
       .text("RELIANCE", { align: "center" });
-
-    doc.moveDown(0.25);
-
-    doc.fontSize(14)
+    doc.moveDown(0.15);
+    doc.fillColor(muted).font("Helvetica-Bold").fontSize(8)
+      .text("EGYPT  ·  CAREERS", { align: "center" });
+    doc.moveDown(0.35);
+    doc.fillColor(navy).font("Helvetica-Bold").fontSize(14)
       .text("APPLICATION FOR EMPLOYMENT", { align: "center" });
-
+    doc.moveDown(0.3);
+    doc.fillColor(muted).font("Helvetica").fontSize(8)
+      .text("Confidential recruitment document generated from the online application form.", { align: "center" });
     doc.moveDown(1);
 
-    doc.font("Helvetica")
-      .fontSize(9)
-      .fillColor("#555555")
-      .text(
-        "Submitted through the Reliance Egypt online application form. Please handle this document as confidential personal information.",
-        { align: "center" }
-      );
+    section("01", "Personal Information");
+    twoFields("Application Date", p.applicationDate, "Full Name *", p.fullName);
+    fullField("Present Address", p.presentAddress, 40);
+    twoFields("Home Phone", p.homePhone, "Mobile Phone", p.mobilePhone);
+    twoFields("Email Address *", p.email, "Age", p.age);
+    twoFields("Date of Birth", p.dateOfBirth, "Nationality", p.nationality);
+    twoFields("Marital Status", p.maritalStatus, "Gender", p.gender);
+    twoFields("Number of Children", p.numberOfChildren, "Position Applied For *", p.positionAppliedFor);
+    twoFields("Expected Salary", p.salaryExpected, "Car and Driving License", p.hasCarAndLicense);
+    fullField("Notice Period", p.noticePeriod);
 
-    doc.moveDown(1.2);
-
-    doc.font("Helvetica-Bold")
-      .fontSize(15)
-      .fillColor("#26384A")
-      .text("Personal Information");
-
-    doc.moveDown(0.7);
-
-    [
-      "applicationDate",
-      "fullName",
-      "presentAddress",
-      "homePhone",
-      "mobilePhone",
-      "email",
-      "age",
-      "dateOfBirth",
-      "nationality",
-      "maritalStatus",
-      "gender",
-      "numberOfChildren",
-      "positionAppliedFor",
-      "salaryExpected",
-      "hasCarAndLicense",
-      "noticePeriod"
-    ].forEach(key => addText(doc, labelFor(key), p[key]));
-
-    doc.addPage();
-
-    doc.font("Helvetica-Bold")
-      .fontSize(15)
-      .fillColor("#26384A")
-      .text("Certificates, Skills & Languages");
-
-    doc.moveDown();
-
-    [
-      "certificatesExtraStudies",
-      "computerSkills",
-      "englishLevel",
-      "frenchLevel",
-      "otherLanguage",
-      "otherLanguageLevel"
-    ].forEach(key => addText(doc, labelFor(key), p[key]));
-
-    addRows(
-      doc,
-      "Education History",
-      p.education,
+    repeatedSection("02", "Education History", p.education,
       ["schoolUniversity", "certificate", "majorDegree", "grade", "graduationDate"],
-      ["School / University", "Certificate", "Major & Degree", "Grade", "Graduation Date"]
-    );
+      ["School / University", "Certificate", "Major & Degree", "Grade", "Graduation Date"]);
 
-    addRows(
-      doc,
-      "Employment History",
-      p.employment,
+    section("03", "Certificates & Skills");
+    fullField("Certificates & Extra Studies", p.certificatesExtraStudies, 40);
+    fullField("Computer Skills & Programs", p.computerSkills, 40);
+    twoFields("English", p.englishLevel, "French", p.frenchLevel);
+    twoFields("Other Language", p.otherLanguage, "Other Language Level", p.otherLanguageLevel);
+
+    repeatedSection("04", "Employment History", p.employment,
       ["company", "jobTitle", "from", "to", "lastPackage", "reasonForLeaving"],
-      ["Company", "Job Title", "From", "To", "Last Package", "Reason for Leaving"]
-    );
+      ["Company", "Job Title", "From", "To", "Last Package", "Reason for Leaving"]);
 
-    addRows(
-      doc,
-      "References",
-      p.references,
+    repeatedSection("05", "References", p.references,
       ["name", "position", "company", "phoneNumber"],
-      ["Name", "Position", "Company", "Phone Number"]
-    );
+      ["Name", "Position", "Company", "Phone Number"]);
 
-    doc.addPage();
+    section("06", "Additional Information");
+    fullField("Relatives or friends currently working at Reliance?", p.hasRelianceContacts);
+    if (p.hasRelianceContacts === "Yes") {
+      fullField("Name and Position", p.relianceContactDetails, 40);
+    }
 
-    doc.font("Helvetica-Bold")
-      .fontSize(15)
-      .fillColor("#26384A")
-      .text("Additional Information & Declaration");
+    section("07", "Declaration & Signature");
+    fullField("Declaration",
+      "I declare that the information provided in this application is accurate and complete. I understand that any misrepresentation or omission of facts may affect my application or employment.",
+      44);
+    twoFields("Typed Signature (Full Name) *", p.signatureName, "Signature Date *", p.signatureDate);
 
-    doc.moveDown();
-
-    addText(doc, labelFor("hasRelianceContacts"), p.hasRelianceContacts);
-    addText(doc, labelFor("relianceContactDetails"), p.relianceContactDetails);
-
-    addText(
-      doc,
-      "Applicant Declaration",
-      "I confirm that the information provided in this application is accurate and complete. I understand that any misrepresentation or omission of facts may affect my employment."
-    );
-
-    addText(doc, labelFor("signatureName"), p.signatureName);
-    addText(doc, labelFor("signatureDate"), p.signatureDate);
-
-    doc.moveDown(1);
-
-    doc.font("Helvetica")
-      .fontSize(8)
-      .fillColor("#666666")
-      .text("Confidential — for recruitment purposes only.", {
-        align: "center"
+    doc.moveDown(0.5);
+    doc.fillColor(muted).font("Helvetica").fontSize(7.5)
+      .text("Privacy notice: Application details are used for recruitment purposes only. Confidential — for Reliance Egypt recruitment.", {
+        align: "center",
+        width: pageWidth
       });
 
     doc.end();
