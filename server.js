@@ -486,7 +486,7 @@ app.post("/api/submit", submitLimiter, async (req, res) => {
         "The completed application is attached as a PDF. Handle it as confidential personal information.",
       attachments: [
         {
-          filename: `${safeFilenamePart(payload.fullName)}_${safeFilenamePart(payload.positionAppliedFor)}.pdf`,
+          filename: `Job_Application_${safeFilenamePart(payload.fullName)}_${safeFilenamePart(payload.positionAppliedFor)}.pdf`,
           content: pdf,
           contentType: "application/pdf"
         }
